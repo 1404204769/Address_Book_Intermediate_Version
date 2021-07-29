@@ -145,19 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Data.cpp" />
-    <ClCompile Include="DB.cpp" />
-    <ClCompile Include="DBcontrol.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="User.cpp" />
-    <ClCompile Include="UserMgr.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Data.h" />
-    <ClInclude Include="DB.h" />
-    <ClInclude Include="test.h" />
-    <ClInclude Include="User.h" />
-    <ClInclude Include="UserMgr.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
