@@ -27,12 +27,14 @@ int Choice() {
 	case 2: {
 		if (!g_UserMgr.ShowOne(g_DB)) {
 			cout << "查询错误，系统出错" << endl;
-		}cout << "查询完毕" << endl;
+		}else 
+			cout << "查询完毕" << endl;
 	}break;
 	case 3: {
 		if (!g_UserMgr.AddUser(g_DB)) {
 			cout << "用户插入失败" << endl;
-		}cout << "用户插入成功" << endl;
+		}else 
+			cout << "用户插入成功" << endl;
 		//g_CUsermgr.showName();
 	}break;
 	case 4: {
@@ -41,8 +43,8 @@ int Choice() {
 		cin >> ninput;
 		if (!g_UserMgr.ProductUser(g_DB, ninput)) {
 			cout << "插入失败，终止批量产生数据" << endl;
-		}
-		cout << "插入成功，批量产生数据已结束" << endl;
+		}else 
+			cout << "插入成功，批量产生数据已结束" << endl;
 	}break;
 	default:
 		return 0;

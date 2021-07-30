@@ -121,32 +121,81 @@ bool CDB::SearchOne(Query& query,const std::string& strColumn, const std::string
 }
 bool CDB::InsertData(const CUser& newUser) {
 	/*插入一条新的值到数据库中，只需要输入账户account的值即可*/
+	try {
+		Query query = CreateQuery();
+		if (!query) {
+			cout << "Query失效，请重新连接" << endl;
+			return false;
+		}
+		query << "insert into addr_book(name,tel,address) values(%0q:name, %1q:tel, %2q:addr)";
+		query.parse();
+		query.template_defaults["name"] = newUser.GetName().c_str();
+		query.template_defaults["tel"] = newUser.GetTel().c_str();
+		query.template_defaults["addr"] = newUser.GetAddress().c_str();
+		//cout << "Query:" << query.str() << endl;
+		if (!query)return false;
+		if (!query.exec()) {
+			//cout << "插入失败" << endl;
+			return false;
+		}
+		//cout << "插入成功" << endl;
+		return true;
+	}
+	catch (const mysqlpp::BadQuery& er) {
+		// Handle any query errors
+		cerr << "Query error: " << er.what() << endl;
+		return false;
+	}
+	catch (const mysqlpp::BadConversion& er) {
+		// Handle bad conversions
+		cerr << "Conversion error: " << er.what() << endl <<
+			"\tretrieved data size: " << er.retrieved <<
+			", actual size: " << er.actual_size << endl;
+		return false;
+	}
+	catch (const mysqlpp::Exception& er) {
+		// Catch-all for any other MySQL++ exceptions
+		cerr << "Error: " << er.what() << endl;
+		return false;
+	}
+}
+bool CDB::InsertSomeData(const std::vector<CUser*>& vecUser) {
+	/*插入一条新的值到数据库中，只需要输入账户account的值即可*/
+	for (CUser* User : vecUser) {
+		if (!InsertData(*User)) {
+			return false;
+		}
+	}
+/*
+
 	Query query = CreateQuery();
 	if (!query) {
 		cout << "Query失效，请重新连接" << endl;
 		return false;
 	}
-	query << "insert into addr_book values(%0q:name, %1q:tel, %2q:addr)";
-	query.parse();
-	query.template_defaults["name"] = newUser.GetName().c_str();
-	query.template_defaults["tel"] = newUser.GetTel().c_str();
-	query.template_defaults["addr"] = newUser.GetAddress().c_str();
-	//cout << "Query:" << query << endl;
-	if (!query)return false;
-	if (!query.exec()) {
-		//cout << "插入失败" << endl;
-		return false;
-	}
+
 	//cout << "插入成功" << endl;
-	return true;
-	
-}
-bool CDB::InsertSomeData(const std::vector<CUser*>& vecUser) {
-	/*插入一条新的值到数据库中，只需要输入账户account的值即可*/
+// 插入操作
+	MYSQL mysql;
+	mysql_query(&mysql, "START TRANSACTION"); // 开启事务， 如果没有开启事务，那么效率会变得非常低下！
+
 	for (CUser *User : vecUser) {
-		if (!InsertData(*User)) {
-			return false;
-		}
+		query.reset();
+		query << "insert into addr_book values(%0q:name, %1q:tel, %2q:addr)";
+		query.parse();
+		query.template_defaults["name"] = User->GetName().c_str();
+		query.template_defaults["tel"] = User->GetTel().c_str();
+		query.template_defaults["addr"] = User->GetAddress().c_str();
+		cout << query.str() << endl;
+		//cout << "Query:" << query << endl;
+		mysql_query(&mysql, query.str().c_str());
 	}
+	MYSQL_RES* result = NULL; // 数据结果集
+	mysql_query(&mysql, "COMMIT"); // 提交事务
+	cout << "insert end" << endl;
+	mysql_free_result(result);
+	mysql_close(&mysql);
+	mysql_library_end();
+*/
 	return true;
 }

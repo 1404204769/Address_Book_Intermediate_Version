@@ -43,15 +43,17 @@ bool  CUserMgr::ProductUser(CDB& TDB,int& nNum) {
 		CUser *TUser = new CUser();
 		RandUser(TDB ,*TUser);
 		m_vecUser.push_back(TUser);
-		cout << i + 1 << ".\tname:" << TUser->GetName() << "\tTel:" << TUser->GetTel() << "\tAddress:" << TUser->GetAddress() << endl;
+		//cout << i + 1 << ".\tname:" << TUser->GetName() << "\tTel:" << TUser->GetTel() << "\tAddress:" << TUser->GetAddress() << endl;
 	}
+
 	if (!TDB.InsertSomeData(m_vecUser)) {
 		return false;
 	}
 	static clock_t sFinish = clock();//声明finish获取结束时间
 	printf("\n");
 	dTime = (double)(sFinish - sStart) / CLOCKS_PER_SEC;
-	cout << "RunningTime: "<< time <<" 秒"<< endl;//显示
+	printf("RunningTime:\n%f 秒\n", dTime);//显示
+	//cout << "RunningTime: "<< time <<" 秒"<< endl;//显示
 	return true;
 }
 void CUserMgr::VecFree() {
@@ -118,9 +120,10 @@ void  CUserMgr::RandUser(CDB& TDB, CUser& _input) {
 	string strTel = RandTel();
 	bool bTel = CheckTel(strTel,TDB);
 	while (!bTel) {
-		//cout<< strTel<<"已存在数据库中" << endl;
+		cout<< strTel<<"已存在数据库中" << endl;
 		strTel = RandTel();
 		bTel = CheckTel(strTel, TDB);
+		cout<<"新的手机号为："<<strTel << endl;
 	}
 	_input.SetTel(strTel);
 	/*
@@ -226,17 +229,16 @@ bool  CUserMgr::CheckTel(const std::string& _inputTel, CDB& TDB) {
 			}
 		}
 	}
-	mysqlpp::Query query = TDB.CreateQuery();
-	if (!TDB.SearchOne(query, "tel", _inputTel)) {
-
-		cout << "调用数据库接口返回的查找query无效" << endl;
-		exit(0);
-	}
-	mysqlpp::StoreQueryResult res = query.store();
-	if (!res.empty()) {
-		//cout << "调用数据库接口返回的查找res集合不为空，说明该手机号已存在" << endl;
-		cout << "该手机号已存在!!" << endl;
-		return false;
-	}
+	//mysqlpp::Query query = TDB.CreateQuery();
+	//if (!TDB.SearchOne(query, "tel", _inputTel)) {
+	//	cout << "调用数据库接口返回的查找query无效" << endl;
+	//	exit(0);
+	//}
+	//mysqlpp::StoreQueryResult res = query.store();
+	//if (!res.empty()) {
+	//	//cout << "调用数据库接口返回的查找res集合不为空，说明该手机号已存在" << endl;
+	//	cout << "该手机号已存在!!" << endl;
+	//	return false;
+	//}
 	return true;
 }
