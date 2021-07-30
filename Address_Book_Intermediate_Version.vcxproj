@@ -155,6 +155,9 @@
     <ClInclude Include="User.h" />
     <ClInclude Include="UserMgr.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="database.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
