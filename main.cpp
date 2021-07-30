@@ -1,73 +1,48 @@
-#define _CRT_SECURE_NO_WARNINGS
+ï»¿#define _CRT_SECURE_NO_WARNINGS
 #include "UserMgr.h"
-#include "Data.h"
 #include "DB.h"
 #include<iostream>
 using namespace std;
 CUserMgr g_UserMgr;
 CUser g_User;
-char g_c[50];
-CUser Input() {
-	char ca[50];
-	CUser temUser;
-	cout << "ÇëÊäÈëÐÕÃû£º" << endl;
-	cin >> ca;
-	temUser.SetName(ca);
-	cout << "ÇëÊäÈëµç»°£º" << endl;
-	cin >> ca;
-	while (!CheckTel(ca)) {
-		cout << "ÇëÖØÐÂÊäÈëµç»°£º" << endl;
-		cin >> ca;
-	}
-	temUser.SetTel(ca);
-	cout << "ÇëÊäÈëµØÖ·£º" << endl;
-	cin >> ca;
-	temUser.SetAddress(ca);
-	return temUser;
-}
-void ProductData(int num) {
-	double time; //¶¨ÒåÔËÐÐÊ±¼ä
-	static clock_t sstart = clock(); //ÉùÃ÷start»ñÈ¡¿ªÊ¼Ê±¼ä
-	cout << "Ëæ»úÉú³É" << num << "ÈËµÄÊý¾Ý" << endl;
-	for (int i = 0; i < num; i++) {
-		g_UserMgr.GetUser(g_User);
-		cout << i + 1 << ".\tname:" << g_User.GetName() << "\tTel:" << g_User.GetTel() << "\tAddress:" << g_User.GetAddress() << endl;
-		g_UserMgr.AddUser(g_User);
-	}
-	static clock_t sfinish = clock();//ÉùÃ÷finish»ñÈ¡½áÊøÊ±¼ä
-	printf("\n");
-	time = (double)(sfinish - sstart) / CLOCKS_PER_SEC;
-	printf("RunningTime:\n%f Ãë\n", time);//ÏÔÊ¾
-}
+CDB g_DB;
 int Choice() {
-	cout << "ÇëÊäÈëÒªÖ´ÐÐµÄ¹¦ÄÜ" << endl;
-	cout << "0.ÍË³ö³ÌÐò" << endl;
-	cout << "1.ÏÔÊ¾ËùÓÐÈËµÄÐÕÃû" << endl;
-	cout << "2.²éÑ¯Ö¸¶¨ÐÕÃû" << endl;
-	cout << "3.ÊäÈëÐÂµÄÊý¾Ý" << endl;
-	cout << "4.Ëæ»ú²úÉúÊý¾Ý" << endl;
+	cout << "è¯·è¾“å…¥è¦æ‰§è¡Œçš„åŠŸèƒ½" << endl;
+	cout << "0.é€€å‡ºç¨‹åº" << endl;
+	cout << "1.æ˜¾ç¤ºæ‰€æœ‰äººçš„å§“å" << endl;
+	cout << "2.æŸ¥è¯¢æŒ‡å®šå§“å" << endl;
+	cout << "3.è¾“å…¥æ–°çš„æ•°æ®" << endl;
+	cout << "4.éšæœºäº§ç”Ÿæ•°æ®" << endl;
 	int nchoice;
 	cin >> nchoice;
+	getchar();
 	switch (nchoice)
 	{
 	case 1:
-		g_UserMgr.ShowName();
+		if (!g_UserMgr.ShowAllName(g_DB)) {
+			cout << "æŸ¥è¯¢é”™è¯¯ï¼Œç³»ç»Ÿå‡ºé”™" << endl;
+		}cout << "æŸ¥è¯¢å®Œæ¯•" << endl;
+		
 		break;
 	case 2: {
-		cout << "ÇëÊäÈëÒª²éÑ¯µÄ¶ÔÏóµÄÃû×Ö" << endl;
-		cin >> g_c;
-		g_UserMgr.ShowDetailByName(g_c);
+		if (!g_UserMgr.ShowOne(g_DB)) {
+			cout << "æŸ¥è¯¢é”™è¯¯ï¼Œç³»ç»Ÿå‡ºé”™" << endl;
+		}cout << "æŸ¥è¯¢å®Œæ¯•" << endl;
 	}break;
 	case 3: {
-		g_User = Input();
-		g_UserMgr.AddUser(g_User);
+		if (!g_UserMgr.AddUser(g_DB)) {
+			cout << "ç”¨æˆ·æ’å…¥å¤±è´¥" << endl;
+		}cout << "ç”¨æˆ·æ’å…¥æˆåŠŸ" << endl;
 		//g_CUsermgr.showName();
 	}break;
 	case 4: {
-		cout << "ÇëÊäÈëÒª²úÉú¶àÉÙÌõÊý¾Ý" << endl;
+		cout << "è¯·è¾“å…¥è¦äº§ç”Ÿå¤šå°‘æ¡æ•°æ®" << endl;
 		int ninput;
 		cin >> ninput;
-		ProductData(ninput);
+		if (!g_UserMgr.ProductUser(g_DB, ninput)) {
+			cout << "æ’å…¥å¤±è´¥ï¼Œç»ˆæ­¢æ‰¹é‡äº§ç”Ÿæ•°æ®" << endl;
+		}
+		cout << "æ’å…¥æˆåŠŸï¼Œæ‰¹é‡äº§ç”Ÿæ•°æ®å·²ç»“æŸ" << endl;
 	}break;
 	default:
 		return 0;
@@ -75,10 +50,11 @@ int Choice() {
 	}
 	return nchoice;
 }
-int test() {
+int main() {
+	g_DB.InitConnect("test", "localhost", "root", "root", 3306);
 	while (1) {
 		system("cls");
-		cout << "»¶Ó­Ê¹ÓÃÀîÖ¾³ÏµÄÍ¨Ñ¶Â¼" << endl;
+		cout << "æ¬¢è¿Žä½¿ç”¨æŽå¿—è¯šçš„é€šè®¯å½•" << endl;
 		if (Choice() == 0)
 			break;
 		system("pause");
