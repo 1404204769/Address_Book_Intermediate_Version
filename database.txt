@@ -1,0 +1,28 @@
+/*创建表*/
+create table if not exists `Addr_book`(
+`name` VARCHAR(20) not null comment '名字,作为普通索引，可以重复',
+`tel` VARCHAR(11) not null unique comment '手机号,不允许重复',
+`address` VARCHAR(150) not null comment '地址',
+index (`name`)
+)comment='通讯录表';
+/*删除表*/
+drop table `Addr_book`;
+
+/*插入新值*/
+
+insert into `addr_book` values ("lzc","18305907908","福建省福州市");
+
+/*查询值*/
+
+EXPLAIN select * from `addr_book` where `name`="lzc";
+
+EXPLAIN select * from `addr_book` where `tel`="18305907907";
+
+select * from `addr_book`
+
+
+show create table addr_book
+
+show full fields from addr_book
+
+show variables like 'char%'
