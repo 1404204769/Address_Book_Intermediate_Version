@@ -161,11 +161,52 @@ bool CDB::InsertData(const CUser& newUser) {
 }
 bool CDB::InsertSomeData(const std::vector<CUser*>& vecUser) {
 	/*插入一条新的值到数据库中，只需要输入账户account的值即可*/
+	/*  //逐条插入的话10万条数据需要432s时间
 	for (CUser* User : vecUser) {
 		if (!InsertData(*User)) {
 			return false;
 		}
 	}
+	*/
+	MYSQL mysql;
+	mysql_init(&mysql);
+	mysql_set_character_set(&mysql, "latin1");
+	if (!mysql_real_connect(&mysql, m_strServer.c_str(), m_strUser.c_str(), m_strPassword.c_str(),m_strDB.c_str() , m_nPort, NULL, 0))
+	{
+		printf("MySQL数据库连接失败。\n");
+		return false;
+	}
+	mysql_autocommit(&mysql, 0);//关闭自动提交
+	int cursor = 1;
+	for(CUser* User : vecUser){
+		Query query = CreateQuery();
+		if (!query) {
+			cout << "Query失效，请重新连接" << endl;
+			return false;
+		}
+		query << "insert into addr_book(name,tel,address) values(%0q:name, %1q:tel, %2q:addr)";
+		query.parse();
+		query.template_defaults["name"] = User->GetName().c_str();
+		query.template_defaults["tel"] = User->GetTel().c_str();
+		query.template_defaults["addr"] = User->GetAddress().c_str();
+		//cout << cursor <<".\t" << query.str() << endl;
+		int nSuccess = mysql_query(&mysql, query.str().c_str());
+		if (nSuccess != 0){
+			const char* mysql_err = mysql_error(&mysql);
+			printf("%s\n", mysql_err);
+			return false;
+		}
+		cursor++;
+		if (cursor == 50000){//每50000条记录提交一次
+			mysql_commit(&mysql);
+			cursor = 0;
+			printf("提交事务完毕\n");
+		}
+	}if (cursor != 0) {//每50000条记录提交一次
+		mysql_commit(&mysql);
+		printf("提交事务完毕\n");
+	}
+	mysql_close(&mysql);
 /*
 
 	Query query = CreateQuery();

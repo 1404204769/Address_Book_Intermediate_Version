@@ -10,20 +10,20 @@ CUserMgr::~CUserMgr() {}
 
 bool CUserMgr::CreateUser(CUser& newUser,CDB& TDB) {
 	/*新建一个CUser，具体数据函数内从命令行获取*/
-	char pszTData[50]="";
+	string strTData="";
 	cout << "请输入姓名：" << endl;
-	cin >> pszTData;
-	newUser.SetName(pszTData);
+	getline(cin, strTData);
+	newUser.SetName(strTData);
 	cout << "请输入电话：" << endl;
-	cin >> pszTData;
-	while (!CheckTel(pszTData,TDB)) {
+	getline(cin, strTData);
+	while (!CheckTel(strTData,TDB)) {
 		cout << "请重新输入电话：" << endl;
-		cin >> pszTData;
+		cin >> strTData;
 	}
-	newUser.SetTel(pszTData);
+	newUser.SetTel(strTData);
 	cout << "请输入地址：" << endl;
-	cin >> pszTData;
-	newUser.SetAddress(pszTData);
+	getline(cin, strTData);
+	newUser.SetAddress(strTData);
 	return true;
 }
 bool  CUserMgr::AddUser(CDB& TDB) {
@@ -42,7 +42,7 @@ bool  CUserMgr::ProductUser(CDB& TDB,int& nNum) {
 		CUser *TUser = new CUser();
 		RandUser(TDB ,*TUser);
 		m_vecUser.push_back(TUser);
-		cout << i + 1 << ".\tname:" << TUser->GetName() << "\tTel:" << TUser->GetTel() << "\tAddress:" << TUser->GetAddress() << endl;
+		//cout << i + 1 << ".\tname:" << TUser->GetName() << "\tTel:" << TUser->GetTel() << "\tAddress:" << TUser->GetAddress() << endl;
 	}
 
 	if (!TDB.InsertSomeData(m_vecUser)) {
@@ -123,7 +123,7 @@ void  CUserMgr::RandUser(CDB& TDB, CUser& _input) {
 		//cout<< strTel<<"已存在数据库中" << endl;
 		strTel = RandTel();
 		bTel = CheckTel(strTel, TDB);
-		cout<<"新的手机号为："<<strTel << endl;
+		//cout<<"新的手机号为："<<strTel << endl;
 	}
 	_input.SetTel(strTel);
 	/*
@@ -159,8 +159,8 @@ string CUserMgr::RandTel() {
 	cnt = 0;
 	for (int i = 0; i < 8; i++) {
 		cnt = cnt * 10 + RandNum(10);
-	}//保证一定有八位数
-	sprintf_s(TelLast, "%d", cnt);
+	}
+	sprintf_s(TelLast, "%08d", cnt);//保证一定有八位数,不足前面补0
 	Tel.append(TelLast);
 	//std::cout << Tel << std::endl;
 	return Tel;
@@ -220,7 +220,7 @@ string CUserMgr::RandAddr() {
 bool  CUserMgr::CheckTel(const std::string& _inputTel, CDB& TDB) {
 	/*用于检查手机号是否规范，并且判断是否存在重复手机号*/
 	if (_inputTel.length() != 11) {
-		cout << "手机号位数不正确，请重新输入" << endl;
+		cout << "手机号位数不正确("<<_inputTel<<")，请重新输入" << endl;
 		return false;
 	}
 	else {
