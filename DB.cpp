@@ -22,9 +22,8 @@ bool CDB::InitConnect(const std::string& strDB, const std::string& strServer, co
 		}
 		Query query = m_Conn.query("set names latin1");
 		if (!query)return false;
-		if (!query.exec()) {
+		if (!query.exec()) 
 			cout << "查询失败" << endl;
-		}
 	}
 	catch (const mysqlpp::BadQuery& er) {
 		// Handle any query errors
@@ -194,8 +193,8 @@ bool CDB::InsertSomeData(const std::vector<CUser*>& vecUser) {
 		mysql_real_connect(&mysql, m_strServer.c_str(), m_strUser.c_str(), m_strPassword.c_str(), m_strDB.c_str(), m_nPort, NULL, 0);
 		mysql_autocommit(&mysql, 0);//关闭自动提交
 		int cursor = 1;
-		for (CUser* User : vecUser) {
-			if (!User)return false;
+		for (CUser* pUser : vecUser) {
+			if (!pUser)return false;
 			Query query = CreateQuery();
 			if (!query) {
 				cout << "Query失效，请重新连接" << endl;
@@ -203,14 +202,14 @@ bool CDB::InsertSomeData(const std::vector<CUser*>& vecUser) {
 			}
 			query << "insert into addr_book(name,tel,address) values(%0q:name, %1q:tel, %2q:addr)";
 			query.parse();
-			query.template_defaults["name"] = User->GetName().c_str();
-			query.template_defaults["tel"] = User->GetTel().c_str();
-			query.template_defaults["addr"] = User->GetAddress().c_str();
+			query.template_defaults["name"] = pUser->GetName().c_str();
+			query.template_defaults["tel"] = pUser->GetTel().c_str();
+			query.template_defaults["addr"] = pUser->GetAddress().c_str();
 			//cout << cursor <<".\t" << query.str() << endl;
 			int nSuccess = mysql_query(&mysql, query.str().c_str());
 			if (nSuccess != 0) {
-				const char* mysql_err = mysql_error(&mysql);
-				printf("%s\n", mysql_err);
+				const char* pMysql_err = mysql_error(&mysql);
+				printf("%s\n", pMysql_err);
 				return false;
 			}
 			cursor++;
