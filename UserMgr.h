@@ -56,19 +56,19 @@ class CUserMgr {
 public://内部的逻辑函数
 	CUserMgr();
 	~CUserMgr();
-	bool CreateUser(CUser& newUser,CDB& TDB);/*新建一个CUser，具体数据函数内从命令行获取*/
-	bool AddUser( CDB& TDB);/*用于将数据添加到addr_book数据库中*/
-	bool ProductUser(CDB& TDB,int& num);/*用于产生指定数量的随机数据*/
+	bool CreateUser(CUser& user,CDB& db);/*新建一个CUser，具体数据函数内从命令行获取*/
+	bool AddUser( CDB& db);/*用于将数据添加到addr_book数据库中*/
+	bool ProductUser(CDB& db,int& num);/*用于产生指定数量的随机数据*/
 	bool Show(const mysqlpp::Query& query);/*对数据输出的功能进行封装*/
-	bool ShowOne(CDB& TDB);/*根据名字展示数据*/
-	bool ShowAllName(CDB& TDB);//打印输出所有的现存的名字
-	void RandUser(CDB& TDB, CUser& _input);/*用于生成随机数据*/
+	bool ShowOne(CDB& db);/*根据名字展示数据*/
+	bool ShowAllName(CDB& db);//打印输出所有的现存的名字
+	void RandUser(CDB& db, CUser& user);/*用于生成随机数据*/
 	void SetSrand();/*修改随机步长*/
-	const int& RandNum(const int& rval);/*获取随机数*/
+	const int& RandNum(const int& nval);/*获取随机数*/
 	std::string RandTel();/*随机产生电话*/
 	std::string RandName();/*随机产生名字*/
 	std::string RandAddr();/*随机产生地址*/
-	bool CheckTel(const std::string& _inputTel, CDB& TDB);/*用于检查手机号是否规范，并且判断是否存在重复手机号*/
+	bool CheckTel(const std::string& strTel, CDB& db);/*用于检查手机号是否规范，并且判断是否存在重复手机号*/
 	void VecFree();/*释放vector数组内的所有指针数据*/
 private:
 	std::vector<CUser*>m_vecUser;//使用vector数组来管理所有的CUser对象

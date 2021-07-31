@@ -1,10 +1,9 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
 #include "UserMgr.h"
 #include "DB.h"
-#include<iostream>
+#include <iostream>
 using namespace std;
 CUserMgr g_UserMgr;
-CUser g_User;
 CDB g_DB;
 int Choice() {
 	cout << "请输入要执行的功能" << endl;
@@ -13,10 +12,10 @@ int Choice() {
 	cout << "2.查询指定姓名" << endl;
 	cout << "3.输入新的数据" << endl;
 	cout << "4.随机产生数据" << endl;
-	int nchoice;
-	cin >> nchoice;
+	int nChoice =0;
+	cin >> nChoice;
 	getchar();
-	switch (nchoice)
+	switch (nChoice)
 	{
 	case 1:
 		if (!g_UserMgr.ShowAllName(g_DB)) {
@@ -39,9 +38,9 @@ int Choice() {
 	}break;
 	case 4: {
 		cout << "请输入要产生多少条数据" << endl;
-		int ninput;
-		cin >> ninput;
-		if (!g_UserMgr.ProductUser(g_DB, ninput)) {
+		int nInput=0;
+		cin >> nInput;
+		if (!g_UserMgr.ProductUser(g_DB, nInput)) {
 			cout << "插入失败，终止批量产生数据" << endl;
 		}else 
 			cout << "插入成功，批量产生数据已结束" << endl;
@@ -50,7 +49,7 @@ int Choice() {
 		return 0;
 		break;
 	}
-	return nchoice;
+	return nChoice;
 }
 int main() {
 	g_DB.InitConnect("test", "localhost", "root", "root", 3306);

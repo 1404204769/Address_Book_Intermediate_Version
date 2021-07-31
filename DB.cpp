@@ -4,29 +4,26 @@ using namespace mysqlpp;
 
 
 CDB::CDB():m_Conn(true),m_nPort(3306){}
-bool CDB::InitConnect(std::string _db, std::string  _Server, std::string _User, std::string _Password, int _Port) {
+bool CDB::InitConnect(const std::string& strDB, const std::string& strServer, const std::string& strUser, const std::string& strPassword, const int& nPort) {
 	
 	try {
 		/*建立数据库连接*/
-		m_strDB = _db;
-		m_strServer = _Server;
-		m_strUser = _User;
-		m_strPassword = _Password;
-		m_nPort = _Port;
-		m_Conn.set_option(new mysqlpp::SetCharsetNameOption("latin1"));//设置字符编码为uft8
-		m_Conn.set_option(new mysqlpp::ReconnectOption(true));
-
-		m_Conn.connect(m_strDB.c_str(), m_strServer.c_str(), m_strUser.c_str(), m_strPassword.c_str(), m_nPort);
-
-
-		cout << m_Conn.error() << endl;
-		if (!m_Conn.connected()) {
+		m_strDB = strDB;
+		m_strServer = strServer;
+		m_strUser = strUser;
+		m_strPassword = strPassword;
+		m_nPort = nPort;
+		if(!m_Conn.set_option(new mysqlpp::SetCharsetNameOption("latin1")))return false;//设置字符编码为uft8
+		if(!m_Conn.set_option(new mysqlpp::ReconnectOption(true)))return false;
+		if (!m_Conn.connect(m_strDB.c_str(), m_strServer.c_str(), m_strUser.c_str(), m_strPassword.c_str(), m_nPort)) {
+			//cout << m_Conn.error() << endl;
 			cout << "数据库链接失败" << endl;
 			return false;
 		}
 		Query query = m_Conn.query("set names latin1");
+		if (!query)return false;
 		if (!query.exec()) {
-			cout << "set 失败" << endl;
+			cout << "查询失败" << endl;
 		}
 	}
 	catch (const mysqlpp::BadQuery& er) {
@@ -48,44 +45,6 @@ bool CDB::InitConnect(std::string _db, std::string  _Server, std::string _User, 
 	}
 	return true;
 }
-//bool CDB::RefreshConnect() {
-//	/*重新建立数据库连接*/
-//	m_Conn.disconnect();
-//	m_Conn.set_option(new mysqlpp::SetCharsetNameOption("latin1"));//设置字符编码为uft8
-//	m_Conn.set_option(new mysqlpp::ReconnectOption(true));
-//	m_Conn.connect(m_strDB.c_str(), m_strServer.c_str(), m_strUser.c_str(), m_strPassword.c_str(), m_nPort);
-//	cout << m_Conn.error() << endl;
-//	if (!m_Conn.connected()) {
-//		cout << "数据库链接失败" << endl;
-//		return false;
-//	}
-//	Query query = m_Conn.query("set names latin1");
-//	if (!query.exec()) {
-//		cout << "query查询 失败" << endl;
-//	}
-//	return true;
-//}
-//std::string CDB::SQL_inject(const std::string& resource_str) {
-//	/*防止SQL注入，检查字符串中有无单引号双引号*/
-//	//cout << "替换前" << resource_str << endl;
-//	string _resource_str(resource_str);
-//	StrReplase(_resource_str, "'", "\\'");
-//	StrReplase(_resource_str, "\"", "\\\"");
-//	//cout << "替换后" << resource_str << endl;
-//	return _resource_str;
-//}
-//bool CDB::StrReplase(std::string& resource_str, const std::string& str_sub, const std::string& str_new) {
-//	/*字符串替换函数*/
-//	string::size_type pos = 0;
-//	string::size_type strLA = str_sub.size();
-//	string::size_type strLB = str_new.size();
-//	while ((pos = resource_str.find(str_sub, pos)) != string::npos)
-//	{
-//		resource_str.replace(pos, strLA, str_new);
-//		pos += strLB;
-//	}
-//	return true;
-//}
 Query CDB::CreateQuery() {
 	try {
 		if (!m_Conn) {
@@ -232,14 +191,11 @@ bool CDB::InsertSomeData(const std::vector<CUser*>& vecUser) {
 		MYSQL mysql;
 		mysql_init(&mysql);
 		mysql_set_character_set(&mysql, "latin1");
-		if (!mysql_real_connect(&mysql, m_strServer.c_str(), m_strUser.c_str(), m_strPassword.c_str(), m_strDB.c_str(), m_nPort, NULL, 0))
-		{
-			printf("MySQL数据库连接失败。\n");
-			return false;
-		}
+		mysql_real_connect(&mysql, m_strServer.c_str(), m_strUser.c_str(), m_strPassword.c_str(), m_strDB.c_str(), m_nPort, NULL, 0);
 		mysql_autocommit(&mysql, 0);//关闭自动提交
 		int cursor = 1;
 		for (CUser* User : vecUser) {
+			if (!User)return false;
 			Query query = CreateQuery();
 			if (!query) {
 				cout << "Query失效，请重新连接" << endl;
