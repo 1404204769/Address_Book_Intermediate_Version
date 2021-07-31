@@ -35,15 +35,14 @@ bool  CUserMgr::AddUser(CDB& TDB) {
 bool  CUserMgr::ProductUser(CDB& TDB,int& nNum) {
 	/*用于将数据添加到addr_book数据库中*/
 	VecFree();
-	static clock_t start = clock(); //获取开始时间
-	double dTime=0; //定义运行时间
+	
 	static clock_t sStart = clock(); //声明start获取开始时间
 	cout << "随机生成" << nNum << "人的数据" << endl;
 	for (int i = 0; i < nNum; i++) {
 		CUser *TUser = new CUser();
 		RandUser(TDB ,*TUser);
 		m_vecUser.push_back(TUser);
-		//cout << i + 1 << ".\tname:" << TUser->GetName() << "\tTel:" << TUser->GetTel() << "\tAddress:" << TUser->GetAddress() << endl;
+		cout << i + 1 << ".\tname:" << TUser->GetName() << "\tTel:" << TUser->GetTel() << "\tAddress:" << TUser->GetAddress() << endl;
 	}
 
 	if (!TDB.InsertSomeData(m_vecUser)) {
@@ -51,7 +50,7 @@ bool  CUserMgr::ProductUser(CDB& TDB,int& nNum) {
 	}
 	static clock_t sFinish = clock();//声明finish获取结束时间
 	printf("\n");
-	dTime = (double)(sFinish - sStart) / CLOCKS_PER_SEC;
+	double dTime = (double)((sFinish - sStart) / CLOCKS_PER_SEC); //定义运行时间
 	printf("RunningTime:\n%f 秒\n", dTime);//显示
 	//cout << "RunningTime: "<< time <<" 秒"<< endl;//显示
 	return true;
@@ -90,9 +89,10 @@ bool CUserMgr::Show(const mysqlpp::Query& query) {
 		m_vecUser.push_back(TUser);
 
 	}
+	int nNum = 0;
 	for (auto it : m_vecUser) {
 		//printf("ID:%10s\tAccount:\tCreate_time:\n", it.id, it.account, it.create_time);
-		cout << left << "Name:" << it->GetName() << "\t\tTel:" << it->GetTel() << "\t\tAddress:" << it->GetAddress() << endl;
+		cout << left << ++nNum <<".\tName:" << it->GetName() << "\t\tTel:" << it->GetTel() << "\t\tAddress:" << it->GetAddress() << endl;
 	}
 	cout << "一共输出" << m_vecUser.size() << "条数据" << endl;
 	return true;
@@ -120,7 +120,7 @@ void  CUserMgr::RandUser(CDB& TDB, CUser& _input) {
 	string strTel = RandTel();
 	bool bTel = CheckTel(strTel,TDB);
 	while (!bTel) {
-		cout<< strTel<<"已存在数据库中" << endl;
+		//cout<< strTel<<"已存在数据库中" << endl;
 		strTel = RandTel();
 		bTel = CheckTel(strTel, TDB);
 		cout<<"新的手机号为："<<strTel << endl;
@@ -156,7 +156,10 @@ string CUserMgr::RandTel() {
 	cnt = RandNum(40);
 	string Tel(caTelHead[cnt]);
 	//区
-	cnt = RandNum(9999999) + 10000000;//保证一定有八位数
+	cnt = 0;
+	for (int i = 0; i < 8; i++) {
+		cnt = cnt * 10 + RandNum(10);
+	}//保证一定有八位数
 	sprintf_s(TelLast, "%d", cnt);
 	Tel.append(TelLast);
 	//std::cout << Tel << std::endl;
